@@ -1,4 +1,3 @@
----
 - name: Deploy Cartoon Webpage
   hosts: web
   become: yes
@@ -10,20 +9,35 @@
         state: present
         update_cache: yes
 
-    - name: Copy index.html to web server
+    - name: Clear old files
+      file:
+        path: /var/www/html/
+        state: absent
+      notify: restart apache
+
+    - name: Recreate HTML folder
+      file:
+        path: /var/www/html/
+        state: directory
+
+    - name: Deploy index.html
       copy:
         src: files/index.html
         dest: /var/www/html/index.html
-        mode: '0644'
 
-    - name: Copy style.css to web server
+    - name: Deploy style.css
       copy:
         src: files/style.css
         dest: /var/www/html/style.css
-        mode: '0644'
 
     - name: Ensure Apache is running
       service:
         name: apache2
         state: started
         enabled: yes
+
+  handlers:
+    - name: restart apache
+      service:
+        name: apache2
+        state: restarted
