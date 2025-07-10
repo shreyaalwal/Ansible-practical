@@ -1,0 +1,29 @@
+---
+- name: Deploy Cartoon Webpage
+  hosts: web
+  become: yes
+
+  tasks:
+    - name: Install Apache
+      apt:
+        name: apache2
+        state: present
+        update_cache: yes
+
+    - name: Copy index.html to web server
+      copy:
+        src: files/index.html
+        dest: /var/www/html/index.html
+        mode: '0644'
+
+    - name: Copy style.css to web server
+      copy:
+        src: files/style.css
+        dest: /var/www/html/style.css
+        mode: '0644'
+
+    - name: Ensure Apache is running
+      service:
+        name: apache2
+        state: started
+        enabled: yes
